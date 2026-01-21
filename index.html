@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Meditation Timer</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Menu Button -->
+    <button class="menu-btn" id="menuBtn" aria-label="Open settings">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- Main Timer Display -->
+    <main class="timer-container">
+      <div class="phase-indicator" id="phaseIndicator"></div>
+      <div class="timer-display" id="timerDisplay">10:00</div>
+      <button class="start-btn" id="startBtn">START</button>
+      <button class="reset-btn" id="resetBtn" style="display: none;">RESET</button>
+    </main>
+
+    <!-- Settings Panel -->
+    <div class="settings-overlay" id="settingsOverlay"></div>
+    <aside class="settings-panel" id="settingsPanel">
+      <h2>Settings</h2>
+
+      <div class="setting-group">
+        <label>Duration</label>
+        <div class="preset-buttons">
+          <button class="preset-btn" data-minutes="5">5</button>
+          <button class="preset-btn" data-minutes="10">10</button>
+          <button class="preset-btn" data-minutes="15">15</button>
+          <button class="preset-btn" data-minutes="20">20</button>
+          <button class="preset-btn" data-minutes="30">30</button>
+        </div>
+        <div class="custom-input">
+          <input type="number" id="customMinutes" min="1" max="120" placeholder="Custom">
+          <span>minutes</span>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label>Pre-countdown</label>
+        <div class="toggle-row">
+          <span>Enable</span>
+          <label class="toggle">
+            <input type="checkbox" id="preCountdownToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="preset-buttons pre-countdown-options">
+          <button class="preset-btn pre-btn" data-seconds="3">3s</button>
+          <button class="preset-btn pre-btn" data-seconds="5">5s</button>
+          <button class="preset-btn pre-btn" data-seconds="10">10s</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label for="startSound">Start Sound</label>
+        <select id="startSound">
+          <option value="bell">Bell</option>
+          <option value="singing-bowl">Singing Bowl</option>
+          <option value="gong">Gong</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+
+      <div class="setting-group">
+        <label for="endSound">End Sound</label>
+        <select id="endSound">
+          <option value="singing-bowl">Singing Bowl</option>
+          <option value="bell">Bell</option>
+          <option value="gong">Gong</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+
+      <button class="test-sound-btn" id="testSoundBtn">Test Sound</button>
+    </aside>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
