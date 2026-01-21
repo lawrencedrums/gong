@@ -8,7 +8,7 @@ const state = {
   preCountdown: 5,          // 5 sec default
   preCountdownEnabled: true,
   startSound: 'bell',
-  endSound: 'singing-bowl',
+  endSound: 'tibetan-bowl',
   isRunning: false,
   isPaused: false,
   currentPhase: 'idle',     // 'idle' | 'pre' | 'main'
@@ -48,16 +48,24 @@ async function initAudio() {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
     // Preload all sounds
-    const sounds = ['bell', 'singing-bowl', 'gong'];
+    const sounds = ['bell', 'tibetan-bowl', 'gong'];
     await Promise.all(sounds.map(loadSound));
   } catch (err) {
     console.warn('Audio initialization failed:', err);
   }
 }
 
+// Map sound names to actual filenames
+const soundFiles = {
+  'bell': 'bell.mp3',
+  'tibetan-bowl': 'e-flat-tibetan-singing-bowl-struck-38746.mp3',
+  'gong': 'gong.mp3'
+};
+
 async function loadSound(name) {
   try {
-    const response = await fetch(`sounds/${name}.mp3`);
+    const filename = soundFiles[name] || `${name}.mp3`;
+    const response = await fetch(`sounds/${filename}`);
     if (!response.ok) {
       // Generate a simple tone as fallback
       audioBuffers[name] = createFallbackTone(name);
@@ -75,7 +83,7 @@ function createFallbackTone(name) {
   // Create different tones for different sounds
   const frequencies = {
     'bell': 880,
-    'singing-bowl': 528,
+    'tibetan-bowl': 528,
     'gong': 196
   };
 
@@ -320,7 +328,7 @@ function loadSettings() {
       state.preCountdown = settings.preCountdown || 5;
       state.preCountdownEnabled = settings.preCountdownEnabled !== false;
       state.startSound = settings.startSound || 'bell';
-      state.endSound = settings.endSound || 'singing-bowl';
+      state.endSound = settings.endSound || 'tibetan-bowl';
       state.remainingTime = state.totalTime;
 
       // Update UI to reflect loaded settings

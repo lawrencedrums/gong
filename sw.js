@@ -1,6 +1,6 @@
 // Service Worker for Meditation Timer PWA
 
-const CACHE_NAME = 'meditation-timer-v1';
+const CACHE_NAME = 'meditation-timer-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -10,7 +10,7 @@ const ASSETS_TO_CACHE = [
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/sounds/bell.mp3',
-  '/sounds/singing-bowl.mp3',
+  '/sounds/e-flat-tibetan-singing-bowl-struck-38746.mp3',
   '/sounds/gong.mp3'
 ];
 
