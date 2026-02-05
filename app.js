@@ -9,6 +9,7 @@ const state = {
   preCountdownEnabled: true,
   startSound: 'bell',
   endSound: 'tibetan-bowl',
+  repeatEndSound: false,
   isRunning: false,
   isPaused: false,
   currentPhase: 'idle',     // 'idle' | 'pre' | 'main'
@@ -32,6 +33,7 @@ const elements = {
   customMinutes: document.getElementById('customMinutes'),
   startSound: document.getElementById('startSound'),
   endSound: document.getElementById('endSound'),
+  repeatEndSoundToggle: document.getElementById('repeatEndSoundToggle'),
   testSoundBtn: document.getElementById('testSoundBtn'),
   presetBtns: document.querySelectorAll('.preset-btn[data-minutes]'),
   preBtns: document.querySelectorAll('.preset-btn[data-seconds]')
@@ -215,6 +217,10 @@ function runTimer() {
       } else {
         // Main timer finished
         playSound(state.endSound);
+        if (state.repeatEndSound) {
+          setTimeout(() => playSound(state.endSound), 2000);
+          setTimeout(() => playSound(state.endSound), 4000);
+        }
         timerComplete();
       }
     } else {
@@ -313,7 +319,8 @@ function saveSettings() {
     preCountdown: state.preCountdown,
     preCountdownEnabled: state.preCountdownEnabled,
     startSound: state.startSound,
-    endSound: state.endSound
+    endSound: state.endSound,
+    repeatEndSound: state.repeatEndSound
   };
   localStorage.setItem('meditationSettings', JSON.stringify(settings));
 }
@@ -329,6 +336,7 @@ function loadSettings() {
       state.preCountdownEnabled = settings.preCountdownEnabled !== false;
       state.startSound = settings.startSound || 'bell';
       state.endSound = settings.endSound || 'tibetan-bowl';
+      state.repeatEndSound = settings.repeatEndSound || false;
       state.remainingTime = state.totalTime;
 
       // Update UI to reflect loaded settings
@@ -346,6 +354,7 @@ function loadSettings() {
 
       elements.startSound.value = state.startSound;
       elements.endSound.value = state.endSound;
+      elements.repeatEndSoundToggle.checked = state.repeatEndSound;
 
     } catch (err) {
       console.warn('Failed to load settings:', err);
@@ -412,6 +421,11 @@ function initEventListeners() {
 
   elements.endSound.addEventListener('change', (e) => {
     state.endSound = e.target.value;
+    saveSettings();
+  });
+
+  elements.repeatEndSoundToggle.addEventListener('change', (e) => {
+    state.repeatEndSound = e.target.checked;
     saveSettings();
   });
 
