@@ -451,9 +451,34 @@ async function registerServiceWorker() {
     try {
       const registration = await navigator.serviceWorker.register('sw.js');
       console.log('Service Worker registered:', registration.scope);
+
+      // Check for updates immediately on page load
+      registration.update();
+
+      // If a new SW is already waiting, it will activate via skipWaiting
+      // and trigger controllerchange below
+      if (registration.waiting) {
+        console.log('New Service Worker waiting, will activate shortly');
+      }
+
+      // Listen for new service workers installing
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'activated') {
+            console.log('New Service Worker activated');
+          }
+        });
+      });
     } catch (err) {
       console.warn('Service Worker registration failed:', err);
     }
+
+    // Reload the page when a new service worker takes control
+    // This fires after skipWaiting + clients.claim in the new SW
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
   }
 }
 

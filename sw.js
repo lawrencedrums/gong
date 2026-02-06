@@ -53,48 +53,70 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - cache-first strategy
+// Static assets that rarely change - use cache-first
+const CACHE_FIRST_PATHS = [
+  '/icons/',
+  '/sounds/'
+];
+
+function isCacheFirst(url) {
+  return CACHE_FIRST_PATHS.some((path) => url.pathname.includes(path));
+}
+
+// Fetch event - network-first for app files, cache-first for static assets
 self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => {
-        if (cachedResponse) {
-          // Return cached version
-          return cachedResponse;
-        }
+  const url = new URL(event.request.url);
 
-        // Not in cache - fetch from network
-        return fetch(event.request)
-          .then((networkResponse) => {
-            // Don't cache non-successful responses
+  if (isCacheFirst(url)) {
+    // Cache-first for static assets (icons, sounds)
+    event.respondWith(
+      caches.match(event.request)
+        .then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          return fetch(event.request).then((networkResponse) => {
             if (!networkResponse || networkResponse.status !== 200) {
               return networkResponse;
             }
-
-            // Clone the response (can only be consumed once)
             const responseToCache = networkResponse.clone();
-
-            // Add to cache for future use
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
             return networkResponse;
-          })
-          .catch(() => {
-            // Network failed and not in cache
-            // Return a fallback for HTML requests
+          });
+        })
+    );
+  } else {
+    // Network-first for app files (HTML, CSS, JS, manifest)
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (!networkResponse || networkResponse.status !== 200) {
+            return networkResponse;
+          }
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match(event.request).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
             if (event.request.headers.get('accept').includes('text/html')) {
               return caches.match('/index.html');
             }
             return new Response('Offline', { status: 503 });
           });
-      })
-  );
+        })
+    );
+  }
 });
